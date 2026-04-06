@@ -1,0 +1,121 @@
+<%- include('../partials/head') %>
+<% const activePage = 'profile'; %>
+<div class="app-layout">
+  <%- include('../partials/sidebar') %>
+  <div class="main-content">
+    <%- include('../partials/navbar') %>
+
+    <div class="page-content fade-in">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title"><i class="fas fa-user-circle"></i> Profile Settings</h1>
+          <p class="page-subtitle">Manage your account information</p>
+        </div>
+      </div>
+
+      <% if (error) { %>
+      <div class="alert alert-error fade-in"><i class="fas fa-circle-exclamation"></i> <%= error %></div>
+      <% } %>
+      <% if (success) { %>
+      <div class="alert alert-success fade-in"><i class="fas fa-circle-check"></i> <%= success %></div>
+      <% } %>
+
+      <div class="profile-layout">
+        <!-- Update Profile -->
+        <div class="section-card glass">
+          <h3 class="section-title"><i class="fas fa-pen-to-square"></i> Edit Profile</h3>
+          <form action="/profile/update" method="POST">
+            <div class="form-group">
+              <label for="name"><i class="fas fa-user"></i> Full Name</label>
+              <input type="text" id="name" name="name" class="form-control" value="<%= profileUser.name %>" required>
+            </div>
+            <div class="form-group">
+              <label for="email"><i class="fas fa-envelope"></i> Email</label>
+              <input type="email" id="email" name="email" class="form-control" value="<%= profileUser.email %>" required>
+            </div>
+            <div class="form-group">
+              <label for="deviceId"><i class="fas fa-mobile-screen"></i> Default Device ID</label>
+              <input type="text" id="deviceId" name="deviceId" class="form-control" value="<%= profileUser.deviceId || '' %>" placeholder="e.g. DEV-iPhone-001">
+            </div>
+            <div class="form-group">
+              <label for="location"><i class="fas fa-location-dot"></i> Default Location</label>
+              <input type="text" id="location" name="location" class="form-control" value="<%= profileUser.location || '' %>" placeholder="e.g. Mumbai, IN">
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Save Changes
+            </button>
+          </form>
+        </div>
+
+        <!-- Change Password -->
+        <div class="section-card glass">
+          <h3 class="section-title"><i class="fas fa-lock"></i> Change Password</h3>
+          <form action="/profile/change-password" method="POST" id="passwordForm">
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <div class="input-with-icon">
+                <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
+                <button type="button" class="toggle-password" onclick="togglePassword('currentPassword')">
+                  <i class="fas fa-eye" id="currentPassword-eye"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <div class="input-with-icon">
+                <input type="password" id="newPassword" name="newPassword" class="form-control" required minlength="6">
+                <button type="button" class="toggle-password" onclick="togglePassword('newPassword')">
+                  <i class="fas fa-eye" id="newPassword-eye"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Confirm New Password</label>
+              <div class="input-with-icon">
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
+                  <i class="fas fa-eye" id="confirmPassword-eye"></i>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-secondary">
+              <i class="fas fa-key"></i> Update Password
+            </button>
+          </form>
+        </div>
+
+        <!-- Account Info -->
+        <div class="section-card glass profile-info-card">
+          <h3 class="section-title"><i class="fas fa-circle-info"></i> Account Info</h3>
+          <div class="info-row">
+            <span class="info-label">Role</span>
+            <span class="badge badge-<%= profileUser.role === 'admin' ? 'admin-badge' : 'user-badge' %>"><%= profileUser.role.toUpperCase() %></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Account Created</span>
+            <span><%= new Date(profileUser.createdAt).toLocaleDateString() %></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Last Updated</span>
+            <span><%= new Date(profileUser.updatedAt).toLocaleDateString() %></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Status</span>
+            <span class="badge badge-allow">ACTIVE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePassword(id) {
+  const input = document.getElementById(id);
+  const eye = document.getElementById(id + '-eye');
+  if (input.type === 'password') { input.type = 'text'; eye.className = 'fas fa-eye-slash'; }
+  else { input.type = 'password'; eye.className = 'fas fa-eye'; }
+}
+</script>
+
+<%- include('../partials/foot') %>

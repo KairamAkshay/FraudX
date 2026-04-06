@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to FraudX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* Welcome Specific Styles */
+    body { background: #FFFFFF; display: flex; flex-direction: column; min-height: 100vh; }
+    .welcome-nav {
+      display: flex; justify-content: space-between; padding: 24px 48px;
+      align-items: center; border-bottom: 1px solid var(--border);
+    }
+    .welcome-brand {
+      font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 800; color: var(--text);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .welcome-brand i { color: var(--accent); }
+    .welcome-hero {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 60px 48px; gap: 60px; max-width: 1200px; margin: 0 auto; width: 100%;
+    }
+    .hero-text { flex: 1; }
+    .hero-text h1 { font-size: 56px; font-weight: 800; color: var(--text); line-height: 1.1; margin-bottom: 24px; }
+    .hero-text h1 span { color: var(--accent); }
+    .hero-text p { font-size: 18px; color: var(--text-muted); line-height: 1.6; margin-bottom: 32px; max-width: 480px; }
+    
+    /* Mock Form matching illustration */
+    .hero-illustration {
+      flex: 1; position: relative; display: flex; justify-content: center;
+    }
+    .illustration-card {
+      background: #FFFFFF; border: 2px solid #2C3E50; border-radius: 8px;
+      padding: 32px; width: 100%; max-width: 320px; box-shadow: 12px 12px 0 rgba(44, 62, 80, 0.1);
+      text-align: center; position: relative; z-index: 2;
+    }
+    .illustration-avatar {
+      width: 64px; height: 64px; background: #2C3E50; border-radius: 50%;
+      margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;
+    }
+    .illustration-input {
+      width: 100%; border: 2px solid #2C3E50; padding: 12px; margin-bottom: 16px;
+      font-family: inherit; font-size: 14px;
+    }
+    .illustration-btn {
+      width: 100%; background: var(--accent); border: 2px solid #2C3E50; color: #2C3E50;
+      padding: 12px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.2s;
+    }
+    .illustration-btn:hover { background: #45B39D; }
+    
+    .hacker-bg {
+      position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+      width: 160px; height: 160px; background: #E5E8E8; border-radius: 50%; border: 2px solid #2C3E50; z-index: 1;
+    }
+    
+    @media (max-width: 900px) {
+      .welcome-hero { flex-direction: column; text-align: center; }
+      .hero-text p { margin: 0 auto 32px; }
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <nav class="welcome-nav">
+    <div class="welcome-brand">
+      <div style="width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid #2C3E50;">
+        F
+      </div>
+      FraudX
+    </div>
+    <div style="display: flex; gap: 16px;">
+      <a href="/login" class="btn btn-ghost" style="border: 2px solid #2C3E50; color: #2C3E50; font-weight: 800;">Log In</a>
+      <a href="/register" class="btn btn-primary" style="background: var(--accent); border: 2px solid #2C3E50; color: #2C3E50; box-shadow: none; font-weight: 800;">Sign Up</a>
+    </div>
+  </nav>
+
+  <section class="welcome-hero">
+    <div class="hero-text">
+      <h1>Detect Fraud <span>Instantly.</span></h1>
+      <p>Secure your transactions with intelligent, real-time ML analysis and explainable AI rules. Block bad actors before they act.</p>
+      <a href="/register" class="btn btn-primary" style="padding: 16px 32px; font-size: 18px; background: var(--accent); border: 2px solid #2C3E50; color: #2C3E50; box-shadow: 6px 6px 0 rgba(44,62,80,0.1); font-weight: 800;">Get Started Now &rarr;</a>
+    </div>
+    
+    <div class="hero-illustration">
+      <div class="hacker-bg"></div>
+      <div class="illustration-card">
+        <div class="illustration-avatar">
+          <i class="fas fa-user-secret"></i>
+        </div>
+        <form action="/login" method="GET">
+          <input type="email" class="illustration-input" placeholder="Enter your email" required>
+          <button type="submit" class="illustration-btn">Next</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

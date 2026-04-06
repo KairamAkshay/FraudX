@@ -1,0 +1,108 @@
+<%- include('../partials/head') %>
+<div class="auth-container">
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="brand-icon-lg">
+        <i class="fas fa-shield-halved"></i>
+      </div>
+      <h1>FraudX</h1>
+      <p>Real-Time Fraud Detection & Prevention</p>
+    </div>
+    <div class="hero-visual floating">
+      <div class="hex-grid">
+        <div class="hex"><i class="fas fa-lock"></i></div>
+        <div class="hex active"><i class="fas fa-brain"></i></div>
+        <div class="hex"><i class="fas fa-shield-halved"></i></div>
+        <div class="hex active"><i class="fas fa-eye"></i></div>
+        <div class="hex"><i class="fas fa-fingerprint"></i></div>
+        <div class="hex active"><i class="fas fa-signal"></i></div>
+      </div>
+    </div>
+    <div class="auth-stats-row">
+      <div class="auth-stat">
+        <span class="stat-num">99.8%</span>
+        <span class="stat-label">Detection Rate</span>
+      </div>
+      <div class="auth-stat">
+        <span class="stat-num">&lt;100ms</span>
+        <span class="stat-label">Response Time</span>
+      </div>
+      <div class="auth-stat">
+        <span class="stat-num">ML+Rules</span>
+        <span class="stat-label">Hybrid Engine</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right fade-in">
+    <div class="auth-card glass">
+      <div class="auth-card-header">
+        <h2>Welcome Back</h2>
+        <p>Sign in to your FraudX account</p>
+      </div>
+
+      <% if (error) { %>
+      <div class="alert alert-error fade-in">
+        <i class="fas fa-circle-exclamation"></i>
+        <%= error %>
+      </div>
+      <% } %>
+
+      <% if (success) { %>
+      <div class="alert alert-success fade-in">
+        <i class="fas fa-circle-check"></i>
+        <%= success %>
+      </div>
+      <% } %>
+
+      <form action="/login" method="POST" class="auth-form" id="loginForm">
+        <div class="form-group">
+          <label for="email">
+            <i class="fas fa-envelope"></i> Email Address
+          </label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="password">
+            <i class="fas fa-lock"></i> Password
+          </label>
+          <div class="input-with-icon">
+            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
+            <button type="button" class="toggle-password" onclick="togglePassword('password')">
+              <i class="fas fa-eye" id="password-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
+          <span class="btn-text"><i class="fas fa-sign-in-alt"></i> Sign In</span>
+          <span class="btn-loader hidden"><i class="fas fa-spinner fa-spin"></i> Authenticating...</span>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Don't have an account? <a href="/register" class="auth-link">Create one</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function togglePassword(id) {
+  const input = document.getElementById(id);
+  const eye = document.getElementById(id + '-eye');
+  if (input.type === 'password') {
+    input.type = 'text';
+    eye.className = 'fas fa-eye-slash';
+  } else {
+    input.type = 'password';
+    eye.className = 'fas fa-eye';
+  }
+}
+document.getElementById('loginForm').addEventListener('submit', function() {
+  const btn = document.getElementById('loginBtn');
+  btn.querySelector('.btn-text').classList.add('hidden');
+  btn.querySelector('.btn-loader').classList.remove('hidden');
+  btn.disabled = true;
+});
+</script>

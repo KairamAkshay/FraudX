@@ -1,0 +1,45 @@
+<link rel="stylesheet" href="/css/chatbot.css">
+
+<!-- Floating Action Button -->
+<button class="chatbot-fab" id="chatbotToggleBtn" aria-label="Open Fraud Advisor">
+  <i class="fas fa-robot"></i>
+  <span class="fab-pulse"></span>
+</button>
+
+<!-- Chatbot Window -->
+<div class="chatbot-window glass fade-in hidden" id="chatbotWindow">
+  <!-- Header -->
+  <div class="chatbot-header">
+    <div class="chatbot-title">
+      <div class="chatbot-avatar"><i class="fas fa-brain"></i></div>
+      <div>
+        <h4>Advisor</h4>
+        <span class="status-indicator"></span>
+      </div>
+    </div>
+    <button class="chatbot-close" id="chatbotCloseBtn"><i class="fas fa-times"></i></button>
+  </div>
+
+  <!-- Messages Area -->
+  <div class="chatbot-messages" id="chatbotMessages">
+    <!-- Initial welcome message -->
+    <div class="chat-bubble bot-bubble slide-up">
+      <div class="bubble-content">
+        Hi there! I'm your FraudX Advisor. How can I assist you with your transactions today?
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggested Actions (Quick Replies) -->
+  <div class="chatbot-suggestions scrollable-x" id="chatbotSuggestions">
+    <button class="suggestion-chip">Explain last transaction</button>
+    <button class="suggestion-chip">Is my account safe?</button>
+    <button class="suggestion-chip">Why was it blocked?</button>
+  </div>
+
+  <!-- Input Area -->
+  <div class="chatbot-input-area">
+    <input type="text" id="chatbotInput" placeholder="Type your message..." autocomplete="off">
+    <button id="chatbotSendBtn"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>

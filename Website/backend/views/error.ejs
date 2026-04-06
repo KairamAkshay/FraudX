@@ -1,0 +1,12 @@
+<%- include('partials/head') %>
+<div class="error-page">
+  <div class="error-content glass fade-in">
+    <div class="error-icon"><i class="fas fa-triangle-exclamation"></i></div>
+    <h1>Error</h1>
+    <h2><%= title || 'Something went wrong' %></h2>
+    <p><%= message || 'An unexpected error occurred.' %></p>
+    <a href="/dashboard" class="btn btn-primary"><i class="fas fa-house"></i> Back to Dashboard</a>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

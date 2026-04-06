@@ -1,0 +1,186 @@
+<%- include('../partials/head') %>
+<% const activePage = 'dashboard'; %>
+<div class="app-layout">
+  <%- include('../partials/sidebar') %>
+  <div class="main-content">
+    <%- include('../partials/navbar') %>
+
+    <div class="page-content fade-in">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title"><i class="fas fa-gauge-high"></i> Dashboard</h1>
+          <p class="page-subtitle">Real-time fraud detection overview</p>
+        </div>
+        <a href="/transactions/simulate" class="btn btn-primary">
+          <i class="fas fa-bolt"></i> Simulate Transaction
+        </a>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card glass slide-up" style="--delay:0">
+          <div class="metric-icon icon-blue">
+            <i class="fas fa-money-bill-transfer"></i>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value"><%= metrics.totalTransactions %></span>
+            <span class="metric-label">Total Transactions</span>
+          </div>
+          <div class="metric-trend up"><i class="fas fa-arrow-trend-up"></i></div>
+        </div>
+
+        <div class="metric-card glass slide-up" style="--delay:1">
+          <div class="metric-icon icon-red">
+            <i class="fas fa-triangle-exclamation"></i>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value"><%= metrics.fraudulentTransactions %></span>
+            <span class="metric-label">Fraudulent Transactions</span>
+          </div>
+          <div class="metric-trend down"><i class="fas fa-arrow-trend-down"></i></div>
+        </div>
+
+        <div class="metric-card glass slide-up" style="--delay:2">
+          <div class="metric-icon icon-teal">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value"><%= metrics.totalUsers %></span>
+            <span class="metric-label">Active Users</span>
+          </div>
+        </div>
+
+        <div class="metric-card glass slide-up" style="--delay:3">
+          <div class="metric-icon icon-orange">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="metric-body">
+            <span class="metric-value"><%= metrics.alertsTriggered %></span>
+            <span class="metric-label">Alerts Triggered</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-row">
+        <div class="chart-card glass">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-bar"></i> Transactions (Last 7 Days)</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="barChart" height="250"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card glass chart-small">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-pie"></i> Fraud vs Normal</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="pieChart" height="250"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="section-card glass mt-4">
+        <div class="section-header">
+          <h3><i class="fas fa-list-check"></i> Recent Transactions</h3>
+          <a href="/transactions" class="btn btn-ghost btn-sm">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Receiver</th>
+                <th>Amount</th>
+                <th>Risk Score</th>
+                <th>Decision</th>
+                <th>Risk Level</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (recentTransactions.length === 0) { %>
+              <tr><td colspan="6" class="empty-state">
+                <i class="fas fa-inbox"></i> No transactions yet. <a href="/transactions/simulate">Simulate one!</a>
+              </td></tr>
+              <% } else { %>
+              <% recentTransactions.forEach(tx => { %>
+              <tr class="table-row-animate">
+                <td class="mono"><%= tx.receiverId %></td>
+                <td class="amount">$<%= tx.amount.toFixed(2) %></td>
+                <td>
+                  <div class="risk-bar-wrap">
+                    <div class="risk-bar" style="width: <%= tx.riskScore %>%; background: <%= tx.riskScore > 75 ? '#ef4444' : tx.riskScore > 50 ? '#f97316' : tx.riskScore > 25 ? '#eab308' : '#22c55e' %>"></div>
+                    <span><%= tx.riskScore %></span>
+                  </div>
+                </td>
+                <td><span class="badge badge-<%= tx.decision %>"><%= tx.decision.toUpperCase() %></span></td>
+                <td><span class="badge badge-risk-<%= tx.riskLevel %>"><%= tx.riskLevel.replace('_',' ').toUpperCase() %></span></td>
+                <td class="text-muted"><%= new Date(tx.createdAt).toLocaleString() %></td>
+              </tr>
+              <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const barLabels = <%- JSON.stringify(chartData.barLabels) %>;
+const barValues = <%- JSON.stringify(chartData.barValues) %>;
+const pieData = <%- JSON.stringify(chartData.pieData) %>;
+
+// Bar chart
+const barCtx = document.getElementById('barChart').getContext('2d');
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: barLabels.length > 0 ? barLabels : ['No Data'],
+    datasets: [{
+      label: 'Transactions',
+      data: barValues.length > 0 ? barValues : [0],
+      backgroundColor: 'rgba(20, 184, 166, 0.6)',
+      borderColor: '#14B8A6',
+      borderWidth: 2,
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#a0aec0' } } },
+    scales: {
+      x: { ticks: { color: '#a0aec0' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { ticks: { color: '#a0aec0' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+    }
+  }
+});
+
+// Pie chart
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+new Chart(pieCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['High Risk / Fraud', 'Normal'],
+    datasets: [{
+      data: pieData,
+      backgroundColor: ['rgba(239, 68, 68, 0.8)', 'rgba(20, 184, 166, 0.8)'],
+      borderColor: ['#ef4444', '#14B8A6'],
+      borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: '#a0aec0' }, position: 'bottom' }
+    }
+  }
+});
+</script>
+
+<%- include('../partials/foot') %>

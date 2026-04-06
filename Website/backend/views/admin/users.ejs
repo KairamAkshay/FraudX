@@ -1,0 +1,87 @@
+<%- include('../partials/head') %>
+<% const activePage = 'admin'; %>
+<div class="app-layout">
+  <%- include('../partials/sidebar') %>
+  <div class="main-content">
+    <%- include('../partials/navbar') %>
+
+    <div class="page-content fade-in">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title"><i class="fas fa-users-gear"></i> User Management</h1>
+          <p class="page-subtitle">Admin panel · <%= users.length %> total users</p>
+        </div>
+      </div>
+
+      <% if (typeof req !== 'undefined' && req.query && req.query.success) { %>
+      <div class="alert alert-success fade-in"><i class="fas fa-circle-check"></i> <%= req.query.success %></div>
+      <% } %>
+      <% if (typeof req !== 'undefined' && req.query && req.query.error) { %>
+      <div class="alert alert-error fade-in"><i class="fas fa-circle-exclamation"></i> <%= req.query.error %></div>
+      <% } %>
+
+      <div class="section-card glass mt-4">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Transactions</th>
+                <th>Avg Amount</th>
+                <th>Alerts</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% users.forEach(u => { %>
+              <tr class="table-row-animate">
+                <td>
+                  <div class="user-cell">
+                    <div class="mini-avatar"><%= u.name.charAt(0).toUpperCase() %></div>
+                    <%= u.name %>
+                  </div>
+                </td>
+                <td class="text-muted"><%= u.email %></td>
+                <td>
+                  <span class="badge badge-<%= u.role === 'admin' ? 'admin-badge' : 'user-badge' %>">
+                    <%= u.role.toUpperCase() %>
+                  </span>
+                </td>
+                <td><%= u.profile ? u.profile.totalTransactions : 0 %></td>
+                <td>$<%= u.profile ? u.profile.avgTransactionAmount.toFixed(2) : '0.00' %></td>
+                <td><%= u.profile ? u.profile.totalAlerts : 0 %></td>
+                <td class="text-muted sm"><%= new Date(u.createdAt).toLocaleDateString() %></td>
+                <td>
+                  <div class="action-btns">
+                    <!-- Change Role Form -->
+                    <form action="/admin/users/<%= u._id %>/role" method="POST" class="inline-form">
+                      <select name="role" class="form-control select-xs">
+                        <option value="user" <%= u.role === 'user' ? 'selected' : '' %>>User</option>
+                        <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                      </select>
+                      <button type="submit" class="btn btn-secondary btn-xs" title="Update Role">
+                        <i class="fas fa-save"></i>
+                      </button>
+                    </form>
+                    <!-- Delete Form -->
+                    <form action="/admin/users/<%= u._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete user <%= u.name %>?')">
+                      <button type="submit" class="btn btn-danger btn-xs" title="Delete User">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/foot') %>

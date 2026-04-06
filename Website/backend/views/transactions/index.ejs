@@ -1,0 +1,124 @@
+<%- include('../partials/head') %>
+<% const activePage = 'transactions'; %>
+<div class="app-layout">
+  <%- include('../partials/sidebar') %>
+  <div class="main-content">
+    <%- include('../partials/navbar') %>
+
+    <div class="page-content fade-in">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title"><i class="fas fa-list-check"></i> Transactions</h1>
+          <p class="page-subtitle"><%= total %> record(s) found</p>
+        </div>
+        <a href="/transactions/simulate" class="btn btn-primary">
+          <i class="fas fa-bolt"></i> New Simulation
+        </a>
+      </div>
+
+      <!-- Search + Filter -->
+      <form action="/transactions/search" method="GET" class="search-bar glass">
+        <div class="search-fields">
+          <div class="search-input-wrap">
+            <i class="fas fa-magnifying-glass"></i>
+            <input type="text" name="q" placeholder="Search by receiver, device, location..." class="search-input" value="<%= typeof q !== 'undefined' ? q : '' %>">
+          </div>
+          <select name="decision" class="form-control select-sm">
+            <option value="">All Decisions</option>
+            <option value="allow">Allow</option>
+            <option value="otp">OTP</option>
+            <option value="delay">Delay</option>
+            <option value="block">Block</option>
+          </select>
+          <select name="riskLevel" class="form-control select-sm">
+            <option value="">All Risk Levels</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="very_high">Very High</option>
+          </select>
+          <button type="submit" class="btn btn-secondary btn-sm">
+            <i class="fas fa-filter"></i> Filter
+          </button>
+          <a href="/transactions" class="btn btn-ghost btn-sm">Clear</a>
+        </div>
+      </form>
+
+      <!-- Table -->
+      <div class="section-card glass mt-4">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Receiver</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Device</th>
+                <th>Location</th>
+                <th>Risk Score</th>
+                <th>ML Prob</th>
+                <th>Decision</th>
+                <th>Risk Level</th>
+                <th>Reasons</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (transactions.length === 0) { %>
+              <tr>
+                <td colspan="11" class="empty-state">
+                  <i class="fas fa-inbox"></i> No transactions found.
+                  <a href="/transactions/simulate">Simulate your first transaction!</a>
+                </td>
+              </tr>
+              <% } else { %>
+              <% transactions.forEach(tx => { %>
+              <tr class="table-row-animate">
+                <td class="mono"><%= tx.receiverId %></td>
+                <td class="amount">$<%= tx.amount.toFixed(2) %></td>
+                <td><span class="badge badge-type"><%= tx.transactionType %></span></td>
+                <td class="text-muted mono sm"><%= tx.deviceId %></td>
+                <td class="text-muted sm"><%= tx.location %></td>
+                <td>
+                  <div class="risk-bar-wrap">
+                    <div class="risk-bar" style="width:<%= tx.riskScore %>%;background:<%= tx.riskScore>75?'#ef4444':tx.riskScore>50?'#f97316':tx.riskScore>25?'#eab308':'#22c55e' %>"></div>
+                    <span><%= tx.riskScore %></span>
+                  </div>
+                </td>
+                <td class="mono"><%= (tx.mlProbability * 100).toFixed(1) %>%</td>
+                <td><span class="badge badge-<%= tx.decision %>"><%= tx.decision.toUpperCase() %></span></td>
+                <td><span class="badge badge-risk-<%= tx.riskLevel %>"><%= tx.riskLevel.replace('_',' ').toUpperCase() %></span></td>
+                <td class="reasons-cell">
+                  <% if (tx.reasons && tx.reasons.length > 0) { %>
+                  <ul class="reasons-mini">
+                    <% tx.reasons.slice(0,2).forEach(r => { %><li><%= r %></li><% }) %>
+                    <% if (tx.reasons.length > 2) { %><li class="text-muted">+<%= tx.reasons.length - 2 %> more</li><% } %>
+                  </ul>
+                  <% } else { %><span class="text-muted">—</span><% } %>
+                </td>
+                <td class="text-muted sm"><%= new Date(tx.createdAt).toLocaleString() %></td>
+              </tr>
+              <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+        <div class="pagination">
+          <% if (currentPage > 1) { %>
+          <a href="/transactions?page=<%= currentPage - 1 %>" class="pagination-btn"><i class="fas fa-chevron-left"></i></a>
+          <% } %>
+          <span class="pagination-info">Page <%= currentPage %> of <%= totalPages %></span>
+          <% if (currentPage < totalPages) { %>
+          <a href="/transactions?page=<%= currentPage + 1 %>" class="pagination-btn"><i class="fas fa-chevron-right"></i></a>
+          <% } %>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/foot') %>

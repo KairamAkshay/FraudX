@@ -1,0 +1,22 @@
+<header class="topnav">
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+    <i class="fas fa-bars"></i>
+  </button>
+  <div class="topnav-right">
+    <div class="nav-search">
+      <i class="fas fa-magnifying-glass"></i>
+    </div>
+    <div class="nav-user">
+      <div class="user-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <div class="user-info">
+        <span class="user-name"><%= user ? user.name : 'Guest' %></span>
+        <span class="user-role badge-<%= user && user.role === 'admin' ? 'admin' : 'user' %>">
+          <%= user ? user.role.toUpperCase() : '' %>
+        </span>
+      </div>
+    </div>
+    <div class="pulse-indicator" title="System Active"></div>
+  </div>
+</header>

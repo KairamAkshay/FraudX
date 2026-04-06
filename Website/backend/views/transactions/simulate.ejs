@@ -1,0 +1,203 @@
+<%- include('../partials/head') %>
+<% const activePage = 'simulate'; %>
+<div class="app-layout">
+  <%- include('../partials/sidebar') %>
+  <div class="main-content">
+    <%- include('../partials/navbar') %>
+
+    <div class="page-content fade-in">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title"><i class="fas fa-bolt"></i> Simulate Transaction</h1>
+          <p class="page-subtitle">Test fraud detection with real-time analysis</p>
+        </div>
+      </div>
+
+      <div class="simulate-layout">
+        <!-- Form -->
+        <div class="simulate-form-card glass">
+          <% if (error) { %>
+          <div class="alert alert-error mb-4"><i class="fas fa-circle-exclamation"></i> <%= error %></div>
+          <% } %>
+
+          <form action="/transactions/simulate" method="POST" id="simulateForm">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="userIdString"><i class="fas fa-id-card"></i> User ID</label>
+                <input type="text" id="userIdString" name="userIdString" class="form-control"
+                  value="<%= userId %>" readonly>
+              </div>
+
+              <div class="form-group">
+                <label for="amount"><i class="fas fa-dollar-sign"></i> Amount ($)</label>
+                <input type="number" id="amount" name="amount" class="form-control"
+                  placeholder="e.g. 1500.00" step="0.01" min="0.01" required>
+              </div>
+
+              <div class="form-group">
+                <label for="receiverId"><i class="fas fa-user-tag"></i> Receiver ID</label>
+                <input type="text" id="receiverId" name="receiverId" class="form-control"
+                  placeholder="e.g. RCV-001" required>
+              </div>
+
+              <div class="form-group">
+                <label for="deviceId"><i class="fas fa-mobile-screen"></i> Device ID</label>
+                <input type="text" id="deviceId" name="deviceId" class="form-control"
+                  placeholder="e.g. DEV-iPhone-001" required>
+              </div>
+
+              <div class="form-group">
+                <label for="location"><i class="fas fa-location-dot"></i> Location</label>
+                <input type="text" id="location" name="location" class="form-control"
+                  placeholder="e.g. Mumbai, IN" required>
+              </div>
+
+              <div class="form-group">
+                <label for="transactionTime"><i class="fas fa-clock"></i> Transaction Time</label>
+                <input type="time" id="transactionTime" name="transactionTime" class="form-control" required>
+              </div>
+
+              <div class="form-group col-span-2">
+                <label><i class="fas fa-exchange-alt"></i> Transaction Type</label>
+                <div class="radio-group">
+                  <label class="radio-card">
+                    <input type="radio" name="transactionType" value="send" checked>
+                    <span class="radio-body"><i class="fas fa-paper-plane"></i> Send Money</span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="transactionType" value="collect">
+                    <span class="radio-body"><i class="fas fa-hand-holding-dollar"></i> Collect Request</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full mt-4" id="submitBtn">
+              <span class="btn-text"><i class="fas fa-radar"></i> Analyze Transaction</span>
+              <span class="btn-loader hidden">
+                <i class="fas fa-spinner fa-spin"></i> Analyzing... Please wait
+              </span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Result Panel -->
+        <% if (result) { %>
+        <div class="result-panel glass fade-in" id="resultPanel">
+          <div class="result-header result-<%= result.riskLevel %>">
+            <div class="result-icon">
+              <% if (result.decision === 'allow') { %><i class="fas fa-circle-check"></i>
+              <% } else if (result.decision === 'otp') { %><i class="fas fa-mobile-screen-button"></i>
+              <% } else if (result.decision === 'delay') { %><i class="fas fa-clock"></i>
+              <% } else { %><i class="fas fa-ban"></i><% } %>
+            </div>
+            <div class="result-title">
+              <h3><%= result.decision === 'allow' ? 'Transaction Allowed' :
+                result.decision === 'otp' ? 'OTP Verification Required' :
+                result.decision === 'delay' ? 'Transaction Delayed — Suspicious Activity' :
+                'Transaction BLOCKED' %></h3>
+              <p class="result-subtitle">Risk Level: <strong><%= result.riskLevel.replace('_',' ').toUpperCase() %></strong></p>
+            </div>
+          </div>
+
+          <% if (result.decision === 'delay') { %>
+          <div class="alert alert-warning">
+            <i class="fas fa-triangle-exclamation"></i>
+            <strong>Suspicious transaction detected.</strong> A delay has been applied. Cancel immediately if this wasn't you.
+          </div>
+          <% } %>
+
+          <!-- Score Breakdown -->
+          <div class="score-grid">
+            <div class="score-item">
+              <span class="score-label">Rule Score</span>
+              <span class="score-value score-neutral"><%= result.ruleScore %></span>
+            </div>
+            <div class="score-item">
+              <span class="score-label">ML Probability</span>
+              <span class="score-value score-neutral"><%= (result.mlProbability * 100).toFixed(1) %>%</span>
+            </div>
+            <div class="score-item">
+              <span class="score-label">Risk Score</span>
+              <span class="score-value score-<%= result.riskLevel %>"><%= result.riskScore %>/100</span>
+            </div>
+            <div class="score-item">
+              <span class="score-label">Decision</span>
+              <span class="badge badge-<%= result.decision %>"><%= result.decision.toUpperCase() %></span>
+            </div>
+          </div>
+
+          <!-- Features -->
+          <div class="features-section">
+            <h4><i class="fas fa-microscope"></i> Feature Analysis</h4>
+            <div class="features-grid">
+              <div class="feature-pill <%= result.features.newReceiver ? 'pill-warn' : 'pill-ok' %>">
+                <i class="fas fa-<%= result.features.newReceiver ? 'user-xmark' : 'user-check' %>"></i>
+                <%= result.features.newReceiver ? 'Unknown Receiver' : 'Known Receiver' %>
+              </div>
+              <div class="feature-pill <%= result.features.newDevice ? 'pill-warn' : 'pill-ok' %>">
+                <i class="fas fa-<%= result.features.newDevice ? 'mobile-screen' : 'circle-check' %>"></i>
+                <%= result.features.newDevice ? 'New Device' : 'Known Device' %>
+              </div>
+              <div class="feature-pill <%= result.features.locationAnomaly ? 'pill-warn' : 'pill-ok' %>">
+                <i class="fas fa-location-dot"></i>
+                <%= result.features.locationAnomaly ? 'Unusual Location' : 'Normal Location' %>
+              </div>
+              <div class="feature-pill <%= result.features.timeAnomaly ? 'pill-warn' : 'pill-ok' %>">
+                <i class="fas fa-clock"></i>
+                <%= result.features.timeAnomaly ? 'Unusual Time' : 'Normal Time' %>
+              </div>
+              <div class="feature-pill <%= result.features.frequencySpike ? 'pill-warn' : 'pill-ok' %>">
+                <i class="fas fa-bolt"></i>
+                <%= result.features.frequencySpike ? 'Frequency Spike' : 'Normal Frequency' %>
+              </div>
+              <div class="feature-pill <%= Math.abs(result.features.amountDeviation) > 1.5 ? 'pill-danger' : 'pill-ok' %>">
+                <i class="fas fa-dollar-sign"></i>
+                Amount Dev: <%= result.features.amountDeviation.toFixed(2) %>x
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Explainability -->
+          <% if (result.reasons && result.reasons.length > 0) { %>
+          <div class="reasons-section">
+            <h4><i class="fas fa-brain"></i> AI Explanation</h4>
+            <ul class="reasons-list">
+              <% result.reasons.forEach(r => { %>
+              <li><i class="fas fa-chevron-right"></i> <%= r %></li>
+              <% }) %>
+            </ul>
+          </div>
+          <% } %>
+
+          <div class="result-actions">
+            <a href="/transactions/simulate" class="btn btn-ghost">
+              <i class="fas fa-plus"></i> New Simulation
+            </a>
+            <a href="/transactions" class="btn btn-secondary">
+              <i class="fas fa-list"></i> View All Transactions
+            </a>
+          </div>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Set default time to now
+const now = new Date();
+const h = String(now.getHours()).padStart(2, '0');
+const m = String(now.getMinutes()).padStart(2, '0');
+document.getElementById('transactionTime').value = h + ':' + m;
+
+document.getElementById('simulateForm').addEventListener('submit', function(e) {
+  const btn = document.getElementById('submitBtn');
+  btn.querySelector('.btn-text').classList.add('hidden');
+  btn.querySelector('.btn-loader').classList.remove('hidden');
+  btn.disabled = true;
+});
+</script>
+
+<%- include('../partials/foot') %>
